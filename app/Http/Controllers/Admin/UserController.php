@@ -28,7 +28,7 @@ class UserController extends AdminController
 
     protected function storeUser($request)
     {
-        return $this->user->create($request->validated() + $this->uploadIDCard($request));
+        return $this->user->create($request->validated() + $this->uploadIDCard($request) + $this->setPassword($request));
     }
 
     protected function updateUser($request)
@@ -44,6 +44,11 @@ class UserController extends AdminController
     protected function updatePassword($request)
     {
         return $request->password ? ['password' => $request->password] : [];
+    }
+
+    protected function setPassword($request)
+    {
+        return $request->password ? ['password' => $request->password] : back()->withErrors('Password tidak boleh kosong');
     }
 
     protected function deleteUser($id)
