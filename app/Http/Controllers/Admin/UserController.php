@@ -16,9 +16,9 @@ class UserController extends AdminController
         $this->fileServices = new FileServices();    
     }
 
-    protected function getUsers()
+    protected function getUsers($condition = [])
     {
-        return $this->user->where('role', 1)->get();
+        return $this->user->where('role', 1)->where($condition)->get();
     }
 
     protected function getUser($id)

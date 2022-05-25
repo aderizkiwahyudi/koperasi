@@ -12,9 +12,11 @@ class Installment extends Model
     protected $fillable = [
         'loan_id',
         'nominal',
+        'image',
+        'status',
     ];
 
-    public function loans()
+    public function loan()
     {
         return $this->belongsTo(Loan::class);
     }

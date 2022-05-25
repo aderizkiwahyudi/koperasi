@@ -38,7 +38,11 @@
                                 </div>
                             </div>
                             <div class="item-footer mt-3">
-                                <a href="{{ route('loan_history.detail', $item->id) }}" class="btn btn-main w-100">Cek</a>
+                                @if (Request::segment(2))
+                                    <a href="{{ route('payment', $item->id) }}" class="btn btn-main w-100">Pembayaran</a>
+                                @else
+                                    <a href="{{ route('loan_history.detail', $item->id) }}" class="btn btn-main w-100">Cek</a>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -56,6 +60,16 @@
                                         <div>
                                             <small>Tanggal</small>
                                             <p>{{ date('d/m/Y', strtotime($installment->created_at)) }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="item-body p-3 border bg-light">
+                                        <div class="item-loans d-flex align-items-center justify-content-between">
+                                            <p>Bukti Pembayaran</p>
+                                            <p>{!! $installment->image ? "<a href='".asset('img/'.$installment->image)."' target='_blank'>Lihat</a>" : "Tidak Ada" !!}</p>
+                                        </div>
+                                        <div class="item-loans d-flex align-items-center justify-content-between">
+                                            <p>Status Pembayaran</p>
+                                            <p>{!! $installment->status == 0 ? "<small class='text-warning'>Pending</small>" : ($installment->status == 1 ? "<small class='text-success'>Diterima</small>" : "<small class='text-danger'>Ditolak</small>") !!}</p>
                                         </div>
                                     </div>
                                 </div>

@@ -25,8 +25,10 @@ class InstalmentRequest extends FormRequest
     {
         return [
             'nominal' => 'required',
-            'created_at' => 'required',
             'loan_id' => 'exists:loans,id',
+            'created_at' => '',
+            'instalment_id' => '',
+            'status' => '',
         ];
     }
 

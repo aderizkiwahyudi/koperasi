@@ -103,6 +103,26 @@ aside .nav ul li.active::before {
     background: #ddd;
 }
 
+aside .nav ul li.submenu {
+    display: block;
+}
+
+aside .nav ul li.submenu ul {
+    display: none;
+    padding: 0;
+    margin: 0;
+    margin: 10px 0;
+}
+
+aside .nav ul li.submenu ul li {
+    margin-left: 0;
+    padding: 10px 27px;
+}
+
+aside .nav ul li.submenu.show ul {
+    display: block;
+}
+
 main {
     overflow: hidden;
     display: flex;

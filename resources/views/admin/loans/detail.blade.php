@@ -14,7 +14,9 @@
 			
 			<div class="content">
 				<x-app-breadcrumb-admin-layout></x-app-breadcrumb-admin-layout>
-				
+
+                <x-alert></x-alert>
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <div class="item content-body">
@@ -75,23 +77,68 @@
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <div class="content-body">
-                            <div class="d-flex justify-content-between">
-                                <h4 class="mb-3">Informasi Karyawan</h4>
-                                <a href="{{ route('admin.employee.detail', $loan->user->id) }}"><span class="badge bg-primary"><i class="bi bi-eye"></i></span></a>
-                            </div>
-
-                            <div class="row form-group">
-                                <div class="col-12 mb-2">
-                                    <div class="row">
-                                        <div class="col-xl-2 col-md-12">Nama</div>
-                                        <div class="col-xl-10 col-md-12">{{ $loan->user->name }}</div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <div class="content-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h4 class="mb-3">Informasi Karyawan</h4>
+                                        <a href="{{ route('admin.employee.detail', $loan->user->id) }}"><span class="badge bg-primary"><i class="bi bi-eye"></i></span></a>
+                                    </div>
+        
+                                    <div class="row form-group">
+                                        <div class="col-12 mb-2">
+                                            <div class="row">
+                                                <div class="col-xl-2 col-md-12">Nama</div>
+                                                <div class="col-xl-10 col-md-12">{{ $loan->user->name }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 mb-2">
+                                            <div class="row">
+                                                <div class="col-xl-2 col-md-12">Email</div>
+                                                <div class="col-xl-10 col-md-12">{{ $loan->user->email }}</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-12 mb-2">
-                                    <div class="row">
-                                        <div class="col-xl-2 col-md-12">Email</div>
-                                        <div class="col-xl-10 col-md-12">{{ $loan->user->email }}</div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <div class="content-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h4 class="mb-3">Transaksi Pembayaran</h4>
+                                        <a href="{{ route('admin.report.transaction', $loan->id) }}"><span class="badge bg-primary p-2"><i class="bi bi-printer"></i> Laporan</span></a>
+                                    </div>
+        
+                                    <div class="row form-group">
+                                        <div class="col-md-12 mb-2">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <td>#</td>
+                                                        <td>Nominal</td>
+                                                        <td>Bukti</td>
+                                                        <td>Tanggal</td>
+                                                        <td>Status</td>
+                                                        <td>Action</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($loan->installments->filter(function($item){ return $item->status != 1; }) as $i => $transaction)
+                                                        <tr>
+                                                            <td>{{ $i+1 }}</td>
+                                                            <td>{{ number_format($transaction->nominal, 0, '.', '.') }}</td>
+                                                            <td>{!! $transaction->image ? "<a href='".asset('img/'. $transaction->image)."'' target='_blank'>Lihat</a>" : 'Tidak ada'; !!}</td>
+                                                            <td>{{ date('d/m/Y', strtotime($transaction->created_at)) }}</td>
+                                                            <td><small>{!! $transaction->status == 0 ? '<span class="text-warning">PENDING</span>' : '<span class="text-danger">DITOLAK</span>' !!}</small></td>
+                                                            <td>
+                                                                <a href="{{ route('admin.loan.transaction', [$transaction->id, 1]) }}" class="badge bg-success"><i class="bi bi-check-lg"></i></a>
+                                                                <a href="{{ route('admin.loan.transaction', [$transaction->id, 2]) }}" class="badge bg-danger"><i class="bi bi-x"></i></a>
+                                                                <a href="{{ route('admin.instalment.delete', $transaction->id) }}" class="badge bg-danger"><i class="bi bi-trash"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -105,12 +152,13 @@
                                     <small>Daftar Riwayat Pembayaran Cicilan</small>
                                 </div>
                                 <div>
+                                    <a href="{{ route('admin.report.instalment.detail', $loan->id) }}"><span class="badge bg-primary p-2"><i class="bi bi-printer"></i> Laporan</span></a>
                                     <a href="javascript:void(0)"  data-bs-toggle="modal" data-bs-target="#add"><span class="badge bg-primary p-2"><i class="bi bi-plus"></i> Tambah</span></a>
                                     
                                     <!-- Modal -->
                                     <div class="modal fade" id="add" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
-                                            <form method="post">
+                                            <form method="post" enctype="multipart/form-data">
                                                 @csrf
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -118,13 +166,21 @@
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
+                                                        <div class="form-group">
+                                                            <input type="hidden" name="status" value="1" class="form-control" placeholder="0"/>
+                                                        </div>
                                                         <div class="form-group mb-3">
                                                             <label for="">Nominal</label>    
                                                             <input type="text" name="nominal" class="form-control" placeholder="0"/>
                                                         </div>
-                                                        <div class="form-group">
+                                                        <div class="form-group mb-3">
                                                             <label for="">Tanggal Pembayaran</label>    
                                                             <input type="date" name="created_at" class="form-control" value="{{ date('Y-m-d') }}"/>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="">Bukti Pembayara</label>    
+                                                            <input type="file" name="file" class="form-control" placeholder="0"/>
+                                                            <small class="text-danger">Kosongkan jika tidak ada</small>
                                                         </div>     
                                                     </div>
                                                     <div class="modal-footer">
@@ -138,7 +194,6 @@
                                     
                                 </div>
                             </div>
-                            <x-alert></x-alert>
                             <div class="table-responsive">
                                 <table id="table" class="stripped">
                                     <thead>
@@ -146,15 +201,17 @@
                                             <th>#</th>
                                             <th>Tanggal</th>
                                             <th>Nominal</th>
+                                            <th>Bukti Pembayaran</th>
                                             <th class="text-center" style="width: 10%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($loan->installments as $i => $installment)
+                                        @foreach ($loan->installments->filter(function($item){ return $item->status == 1; }) as $i => $installment)
                                             <tr>
                                                 <td>{{ $i + 1 }}</td>
                                                 <td>{{ date('d/m/Y', strtotime($installment->created_at)) }}</td>
                                                 <td>Rp {{ number_format($installment->nominal, 0, '.', '.') }}</td>
+                                                <td>{!! $installment->image ? "<a href='".asset('img/'. $installment->image)."'' target='_blank'>Lihat</a>" : 'Tidak ada'; !!}</td>
                                                 <td>
                                                     <div class="d-flex">
                                                         <div class="me-2">
@@ -163,7 +220,7 @@
                                                             <!-- Modal -->
                                                             <div class="modal fade" id="edit-{{ $installment->id }}" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
                                                                 <div class="modal-dialog" role="document">
-                                                                    <form method="post" action="{{ route('admin.instalment.edit', $installment->id) }}">
+                                                                    <form method="post" action="{{ route('admin.instalment.edit', [$loan->id, $installment->id]) }}">
                                                                         @csrf
                                                                         <div class="modal-content">
                                                                             <div class="modal-header">
@@ -175,10 +232,20 @@
                                                                                     <label for="">Nominal</label>    
                                                                                     <input type="text" name="nominal" value="{{ number_format($installment->nominal, 0, '.', '.') }}" class="form-control" placeholder="0"/>
                                                                                 </div>
-                                                                                <div class="form-group">
+                                                                                <div class="form-group mb-3">
                                                                                     <label for="">Tanggal Pembayaran</label>    
                                                                                     <input type="date" name="created_at" class="form-control" value="{{ date('Y-m-d', strtotime($installment->created_at)) }}"/>
-                                                                                </div>     
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="">Bukti Pembayara</label>    
+                                                                                    <input type="file" name="file" class="form-control" placeholder="0"/>
+                                                                                    <small class="text-danger">Kosongkan jika tidak ada</small>
+                                                                                    @if ( $installment->image )
+                                                                                        <div class="mt-3">
+                                                                                            <img src="{{ asset('img/' . $installment->image) }}" width="100%" alt="Bukti Pembayaran"/>
+                                                                                        </div>
+                                                                                    @endif
+                                                                                </div>
                                                                             </div>
                                                                             <div class="modal-footer">
                                                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

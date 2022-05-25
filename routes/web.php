@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForgetPasswordController;
+use App\Http\Controllers\InstalmentController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\LoanHistoryController;
 use App\Http\Controllers\LoginController;
@@ -41,11 +42,13 @@ Route::group(['middleware' => ['auth:user']], function(){
     Route::get('pengajuan-pinjaman', [LoanController::class, 'index'])->name('loan');
     Route::get('riwayat-pinjaman', [LoanHistoryController::class, 'index'])->name('loan_history');
     Route::get('riwayat-pinjaman/{id}', [LoanHistoryController::class, 'detail'])->name('loan_history.detail');
+    Route::get('pembayaran/{id}', [InstalmentController::class, 'index'])->name('payment');
     Route::get('pengaturan', [SettingController::class, 'index'])->name('setting');
     Route::get('logout', [DashboardController::class, 'logout'])->name('logout');
 
     Route::post('pengajuan-pinjaman', [LoanController::class, 'store'])->name('loan.process');
     Route::post('pengaturan', [SettingController::class, 'update'])->name('setting.process');
+    Route::post('pembayaran/{id}', [InstalmentController::class, 'store'])->name('payment.add');
 });
 
 Route::group(['middleware' => ['auth:admin'], 'prefix' => 'admin'], function(){
@@ -67,9 +70,10 @@ Route::group(['middleware' => ['auth:admin'], 'prefix' => 'admin'], function(){
         Route::get('/detail/{id}', [AdminLoanController::class, 'loan_detail'])->name('admin.loan.detail');
         Route::get('/action/{id}/{status}', [AdminLoanController::class, 'loan_action'])->name('admin.loan.action');
         Route::get('/delete/{id}', [AdminLoanController::class, 'loan_delete'])->name('admin.loan.delete');
+        Route::get('/transaction/{id}/{status}', [AdminInstalmentController::class, 'instalment_change_status'])->name('admin.loan.transaction');
 
         Route::post('/detail/{id}', [AdminInstalmentController::class, 'instalment_add'])->name('admin.instalment.add');
-        Route::post('/instalment/edit/{id}', [AdminInstalmentController::class, 'instalment_edit'])->name('admin.instalment.edit');
+        Route::post('/instalment/edit/{id}/{instalment_id}', [AdminInstalmentController::class, 'instalment_edit'])->name('admin.instalment.edit');
         Route::get('/instalment/delete/{id}', [AdminInstalmentController::class, 'instalment_delete'])->name('admin.instalment.delete');
     });
 
@@ -80,6 +84,15 @@ Route::group(['middleware' => ['auth:admin'], 'prefix' => 'admin'], function(){
         Route::get('/edit/{id}', [AdminLoanRecommendationController::class, 'recommendation_edit'])->name('admin.recommendation.edit');
         Route::post('/edit/{id}', [AdminLoanRecommendationController::class, 'recommendation_edit_process'])->name('admin.recommendation.edit.process');
         Route::get('/delete/{id}', [AdminLoanRecommendationController::class, 'recommendation_delete'])->name('admin.recommendation.delete');
+    });
+
+    Route::group(['prefix' => 'laporan'], function(){
+        Route::get('/karyawan', [AdminUserController::class, 'report_employees'])->name('admin.report.employees');
+        Route::get('/pinjaman', [AdminLoanController::class, 'report_loans'])->name('admin.report.loans');
+        Route::get('/angsuran', [AdminInstalmentController::class, 'report_instalments'])->name('admin.report.instalment');
+        Route::get('/angsuran/{id}', [AdminInstalmentController::class, 'report_instalment'])->name('admin.report.instalment.detail');
+        Route::get('/transaksi', [AdminInstalmentController::class, 'report_transactions'])->name('admin.report.transactions');
+        Route::get('/transaksi/{id}', [AdminInstalmentController::class, 'report_transaction'])->name('admin.report.transaction');
     });
 
     Route::get('pengaturan-pinjaman', [AdminLoanController::class, 'loan_setting'])->name('admin.loan_setting');

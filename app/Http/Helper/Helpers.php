@@ -1,4 +1,6 @@
-<?php 
+<?php
+
+use App\Models\User;
 
 function getInstalment($nominal, $length_of_loan, $interest_rate)
 {
@@ -18,4 +20,8 @@ function countInstalment($nominal, $length_of_loan, $interest_rate)
 function getUserStatus($status)
 {
     return $status == 0 ? '<span class="badge bg-warning">Pending</span>' : ($status == 1 ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Tidak Aktif</span>');
+}
+
+function getUserWithId($id){
+    return User::where('id', $id)->first()->name ?? 'User Not Found';
 }

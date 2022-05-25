@@ -84,6 +84,11 @@ class AdminController extends Controller
         return $this->updateLoanSetting($settingRequest) ? back()->with('success', 'Berhasil menyimpan pengaturan') : back()->withErrors('Terjadi kesalahan, silakan hubungi admin');
     }
 
+    public function instalment_change_status(Request $request)
+    {
+        return $this->updateInstalmentStatus($request) ? back()->with('success', 'Berhasil mengubah status transaksi') : back()->withErrors('Terjadi kesalahan, silakan coba lagi');
+    }
+
     public function recommendations(Settings $settings)
     {
         return view('admin.recommendations.index', ['recommendations' => $this->getRecommendations(), 'setting' => $settings->first()]);
@@ -127,6 +132,36 @@ class AdminController extends Controller
     public function instalment_delete(Request $request)
     {
         return $this->deleteInstalment($request->id) ? back()->with('success', 'Berhasil menghapus pembayaran') : back()->withErrors('Data riwayat pembayaran tidak ditemukan');
+    }
+
+    public function report_employees()
+    {
+        return view('admin.reports.employees', ['users' => $this->getUsers(['status' => 1])]);
+    }
+
+    public function report_loans(Request $request)
+    {
+        return view('admin.reports.loans', ['loans' => $this->getLoans(['status' => 1])]);
+    }
+
+    public function report_instalments(Request $request)
+    {
+        return view('admin.reports.instalments', ['instalments' => $this->getInstalments()]);
+    }
+
+    public function report_instalment(Request $request)
+    {
+        return view('admin.reports.instalments', ['instalments' => $this->getInstalments(['loan_id' => $request->id, 'status' => 1])]);
+    }
+
+    public function report_transactions(Request $request)
+    {
+        return view('admin.reports.transactions', ['transactions' => $this->getInstalments()]);
+    }
+
+    public function report_transaction(Request $request)
+    {
+        return view('admin.reports.transactions', ['transactions' => $this->getInstalments(['loan_id' => $request->id])]);
     }
 
     public function setting_account()

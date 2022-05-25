@@ -37,7 +37,7 @@
                                         <tr>
                                             <td>{{ $i+1 }}</td>
                                             <td>{{ $loan->user->name }}</td>
-                                            <td>{{ number_format($loan->nominal, 0, '.', '.') }}</td>
+                                            <td>Rp {{ number_format($loan->nominal, 0, '.', '.') }}</td>
                                             <td>{{ $loan->length_of_loan }} Bulan</td>
                                             <td class="text-center">{!! getLoanStatus($loan->status) !!}</td>
                                             <td class="text-center">

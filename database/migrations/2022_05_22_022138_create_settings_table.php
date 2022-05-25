@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->integer('interest_rate')->comment('Suku Bunga dalam persen');
-            $table->integer('penalties')->comment('Denda dalam persen');
             $table->integer('max_length_of_loan')->comment('Batas Tenor');
             $table->timestamps();
         });

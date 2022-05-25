@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('loan_id')->unsigned();
             $table->bigInteger('nominal');
+            $table->text('image')->nullable();
+            $table->bigInteger('status')->default(0);
             $table->timestamps();
 
             $table->foreign('loan_id')->references('id')->on('loans')->onDelete('cascade');

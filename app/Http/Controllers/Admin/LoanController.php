@@ -16,9 +16,9 @@ class LoanController extends AdminController
         $this->setting = new Settings();
     }
 
-    protected function getLoans()
+    protected function getLoans($condition = [])
     {
-        return $this->loans->latest()->get();
+        return $this->loans->where($condition)->latest()->get();
     }
 
     protected function getLoan($id)
